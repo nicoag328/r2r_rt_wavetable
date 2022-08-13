@@ -3,26 +3,36 @@
 #include "hardware/gpio.h"
 
 #define FIRST_DAC_PIN 7
-#define WAVETABLE_LENGTH 96
-#define SAMPLE_RATE 100000
+#define WAVETABLE_LENGTH 96.0
+#define SAMPLE_RATE 50000
 
-volatile uint8_t sine[96] = {127, 135, 144, 152, 160, 168, 176, 183, 191, 198, 205, 211, 217, 223, 228, 233, 237, 241, 245, 248, 250, 252, 253, 254, 255, 254, 253, 252, 250, 248, 245, 241, 237, 233, 228, 223, 217, 211, 205, 198, 191, 183, 176, 168, 160, 152, 144, 135, 127, 119, 110, 102, 94, 86, 78, 71, 63, 56, 49, 43, 37, 31, 26, 21, 17, 13, 9, 6, 4, 2, 1, 0, 0, 0, 1, 2, 4, 6, 9, 13, 17, 21, 26, 31, 37, 43, 49, 56, 63, 71, 78, 86, 94, 102, 110, 119};
+volatile uint8_t wavetable[96] = {127, 135, 144, 152, 160, 168, 176, 183, 191, 198, 205, 211, 217, 223, 228, 233, 237, 241, 245, 248, 250, 252, 253, 254, 255, 254, 253, 252, 250, 248, 245, 241, 237, 233, 228, 223, 217, 211, 205, 198, 191, 183, 176, 168, 160, 152, 144, 135, 127, 119, 110, 102, 94, 86, 78, 71, 63, 56, 49, 43, 37, 31, 26, 21, 17, 13, 9, 6, 4, 2, 1, 0, 0, 0, 1, 2, 4, 6, 9, 13, 17, 21, 26, 31, 37, 43, 49, 56, 63, 71, 78, 86, 94, 102, 110, 119};
 
 volatile float phase = 0.0;
-volatile float frequency = 3000.0;
+volatile float frequency = 440.0;
 
 // Write sample to DAC. This function is called at sampling rate freq
 bool write_sample(struct repeating_timer *t)
 {
+	// Linear interpolation
+	int index_below = (int)(phase);
+	int index_above = index_below + 1;
+	if (index_above >= WAVETABLE_LENGTH)
+		index_above = 0;
+
+	float fraction_above = phase - index_below;
+	float fraction_below = 1.0 - fraction_above;
+
+	uint8_t val = (fraction_below * wavetable[index_below]) + (fraction_above * wavetable[index_above]);
+
 	// Calculate sample to write	
 	phase += WAVETABLE_LENGTH * frequency / SAMPLE_RATE;
 
-	while (phase >= 96.0){
-		phase -= 96.0;
+	while (phase >= WAVETABLE_LENGTH){
+		phase -= WAVETABLE_LENGTH;
 	}
 
 	// Write sample to DAC
-	uint8_t val = sine[(int)(phase)];
 	int32_t mask = val << FIRST_DAC_PIN;
 	gpio_put_masked(255<<FIRST_DAC_PIN, mask);	
 	return true;
@@ -39,12 +49,12 @@ int main() {
         gpio_set_dir(gpio, GPIO_OUT);
     }
 	
-	// Timer for sample rate. Gets called every 10us (100.000kHz)
+	// Timer for sample rate. Gets called every 20us (50.000kHz)
 	struct repeating_timer samplerate_timer;
-	add_repeating_timer_us(-10, write_sample, NULL, &samplerate_timer);
+	add_repeating_timer_us(-20, write_sample, NULL, &samplerate_timer);
 
     while (true) {
-		sleep_ms(100);
+		sleep_ms(500);
     }
 
     return 0;
