@@ -25,27 +25,6 @@ void env_init(volatile struct env_t* env)
 	env->release_dx = 3;
 }
 
-//TODO rewrite state machine
-void env_change_state(volatile struct env_t* env)
-{
-	switch(env->state)
-	{
-		case ENV_ATTACK:
-			env->state = ENV_SUSTAIN;
-			break;
-
-		case ENV_SUSTAIN:
-			env->state = ENV_RELEASE;
-			env->level = 0xFF<<11;
-			break;
-
-		case ENV_RELEASE:
-			env->state = ENV_ATTACK;
-			env->level = 0;
-			break;
-	}
-}
-
 void env_gate(volatile struct env_t* env, bool gate)
 {
 	if(gate == true)
@@ -78,7 +57,7 @@ int8_t env_run(volatile struct env_t* env, int8_t input)
 	if(env->state == ENV_ATTACK)
 	{
 		if (env->level >= 0xFF<<11)
-			env_change_state(env);
+			env->state = ENV_SUSTAIN;
 		else
 			env->level += env->attack_dx;
 	}
