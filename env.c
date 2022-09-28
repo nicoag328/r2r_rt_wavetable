@@ -71,17 +71,17 @@ int8_t env_run(volatile struct env_t* env, int8_t input)
 	}
 
 	bool is_neg = false;
-	volatile uint32_t temp;
+	volatile uint32_t out;
 
 	if(input < 0)
 	{
 		is_neg = true;
-		temp = input * -1;
+		out = input * -1;
 	}
 	else
-		temp = input;
+		out = input;
 	
-	temp = ((temp<<8) * (env->level>>11)) >> 16;
+	out = ((temp<<8) * (env->level>>11)) >> 16;
 	int8_t out = temp;
 
 	if(is_neg == true)
