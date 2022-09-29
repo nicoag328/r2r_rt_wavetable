@@ -81,13 +81,12 @@ int8_t env_run(volatile struct env_t* env, int8_t input)
 	else
 		out = input;
 	
-	out = ((temp<<8) * (env->level>>11)) >> 16;
-	int8_t out = temp;
+	out = ((out<<8) * (env->level>>11)) >> 16;
+	env->sample = out;
 
 	if(is_neg == true)
-		 out *= -1;
+		 env->sample *= -1;
 
-	env->sample = out;
 	return env->sample;
 }
 
