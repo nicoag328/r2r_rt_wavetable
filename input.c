@@ -27,7 +27,7 @@ void input_init(struct input_t* input, uint8_t clk_pin, uint8_t load_pin, uint8_
 
 }
 
-int input_read(struct input_t* input)
+uint8_t input_read(struct input_t* input)
 {
 
 	// Load into register
@@ -38,7 +38,7 @@ int input_read(struct input_t* input)
 
 	// Read register
 	// uint32_t data = 0;
-	int pos;
+	uint8_t pos;
 	for (pos = 20; pos > 0; pos--)
 	{
 		// Read data

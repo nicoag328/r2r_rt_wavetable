@@ -42,12 +42,12 @@ void env_gate(volatile struct env_t* env, bool gate)
 
 void env_set_attack(volatile struct env_t* env, uint32_t attack_time)
 {
-	env->attack_dx = 0xFF<<11 / attack_time;
+	env->attack_dx = attack_time>>2;
 }
 
 void env_set_release(volatile struct env_t* env, uint32_t release_time)
 {
-	env->release_dx = 0xFF<<11 / release_time;
+	env->release_dx = release_time>>2;
 }
 
 

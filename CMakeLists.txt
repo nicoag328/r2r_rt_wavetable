@@ -4,7 +4,7 @@ if (TARGET tinyusb_device)
 	        )
 	
 	# Pull in our pico_stdlib which pulls in commonly used features
-	target_link_libraries(r2r_rt_wavetable pico_stdlib hardware_pwm hardware_adc)
+	target_link_libraries(r2r_rt_wavetable pico_stdlib hardware_pwm hardware_adc hardware_interp)
 	
 	pico_enable_stdio_usb(r2r_rt_wavetable 1)
 	pico_enable_stdio_uart(r2r_rt_wavetable 0) 

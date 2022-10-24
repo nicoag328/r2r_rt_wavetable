@@ -1,5 +1,5 @@
 // Oscillator module
-// TODO Use fixed-point frequencies?
+// TODO Flexible sample-rate
 
 #define SAMPLE_RATE 100000
 
